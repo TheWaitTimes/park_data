@@ -23,7 +23,10 @@ jobs:
         install.packages('tidyverse')
         install.packages('RSQLite')
         install.packages('here')
-        install.packages('vroom')
+        install.packages('vroom'),
+        repos='http://cran.us.r-project.org')           
+        remotes::install_deps(dependencies = TRUE)           
+        remotes::install_github("repo/package")
     
     - name: Run R script
       env:

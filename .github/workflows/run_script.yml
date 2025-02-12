@@ -41,11 +41,11 @@ jobs:
       shell: Rscript {0}
     
     - name: Run R script
-    env:
+      env:
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_NAME: ${{ secrets.DB_NAME }}
-        run: |
-          Rscript park_data/disneydata.R
+      run: |
+        Rscript path/to/your_script.R

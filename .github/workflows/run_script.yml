@@ -24,16 +24,28 @@ jobs:
         install.packages('RSQLite')
         install.packages('here')
         install.packages('vroom'),
-        repos='http://cran.us.r-project.org')           
-        remotes::install_deps(dependencies = TRUE)           
-        remotes::install_github("repo/package")
+        saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
+        writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+      shell: Rscript {0}
+
+    - name: Cache R packages
+      uses: actions/cache@v1
+      with:
+        path: ${{ env.R_LIBS_USER }}
+        key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+        restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+
+    - name: Install dependencies
+      run: |
+        remotes::install_deps(dependencies = TRUE)
+      shell: Rscript {0}
     
     - name: Run R script
-      env:
+    env:
         DB_HOST: ${{ secrets.DB_HOST }}
         DB_PORT: ${{ secrets.DB_PORT }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_NAME: ${{ secrets.DB_NAME }}
-      run: |
-        Rscript park_data/disneydata.R
+        run: |
+          Rscript park_data/disneydata.R

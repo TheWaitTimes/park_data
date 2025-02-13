@@ -1,8 +1,3 @@
-library(tidyverse)
-library(DBI)
-library(RSQLite)
-library(here)
-library(vroom)
 library(DBI)
 library(RPostgres)
 library(dplyr)

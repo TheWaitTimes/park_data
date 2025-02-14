@@ -28,6 +28,7 @@ ep_data <- ep_df$liveData
 
 ep_data$time <- Sys.time()
 
+ep_data <- ep_data[c(2:3, 6:7, 12:28)]
 
 #Magic Kingdom
 mk_res <- "https://api.themeparks.wiki/v1/entity/75ea578a-adc8-4116-a54d-dccb60765ef9/live"
@@ -39,6 +40,8 @@ mk_df <- mk_res %>%
 mk_data <- mk_df$liveData
 
 mk_data$time <- Sys.time()
+
+mk_data <- mk_data[c(2:3, 6,8, 12:27)]
 
 
 #Hollywood Studios
@@ -52,6 +55,8 @@ hs_data <- hs_df$liveData
 
 hs_data$time <- Sys.time()
 
+hs_data <- hs_data[c(2:3, 6,8, 12:23)]
+
 
 #Animal Kingdom
 ak_res <- "https://api.themeparks.wiki/v1/entity/1c84a229-8862-4648-9c71-378ddd2c7693/live"
@@ -63,6 +68,8 @@ ak_df <- ak_res %>%
 ak_data <- ak_df$liveData
 
 ak_data$time <- Sys.time()
+
+ak_data <- ak_data[c(2:3, 6,7, 12:22)]
 
 
 dbSafeNames = function(names) {

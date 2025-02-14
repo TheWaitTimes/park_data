@@ -2,7 +2,7 @@ name: Run R Script with PostgreSQL
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # This runs the script every 5 mins
+    - cron: '*/5 3-18 * * *'  # This runs the script every 5 mins
 
 jobs:
   run-r-script:

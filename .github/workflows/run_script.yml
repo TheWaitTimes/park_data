@@ -47,8 +47,7 @@ jobs:
         install.packages('DBI')
         install.packages('RPostgres')
         install.packages('dplyr')
-        saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
-        writeLines(sprintf("R-%i.%i", getRversion()$major, getRversion()$minor), ".github/R-version")
+        source("R/install_deps_with_fallback.R")
       shell: Rscript {0}
 
     - name: Cache R packages

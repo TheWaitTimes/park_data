@@ -2,6 +2,14 @@ library(DBI)
 library(RPostgres)
 library(dplyr)
 
+# Ensure no missing values in dependencies
+deps <- deps[!is.na(deps)]
+inst_ver <- inst_ver[!is.na(inst_ver)]
+cran_ver <- cran_ver[!is.na(cran_ver)]
+
+# Create the data frame
+df <- data.frame(package = deps, installed = inst_ver, available = cran_ver, stringsAsFactors = FALSE)
+
 db_host <- Sys.getenv("DB_HOST")
 db_port <- Sys.getenv("DB_PORT")
 db_user <- Sys.getenv("DB_USER")

@@ -5,7 +5,7 @@ on:
     - cron: '*/5 * * * *'
 
 jobs:
-   setup-r-environment:
+  setup-r-environment:
     runs-on: ubuntu-latest
 
     steps:
@@ -41,32 +41,65 @@ jobs:
       run: |
         Rscript -e 'remotes::install_deps(dependencies = TRUE)'
   
-    run-r-script:
-      runs-on: ubuntu-latest
+  run-r-script:
+    runs-on: ubuntu-latest
 
-      services:
-        postgres:
-          image: postgres:latest
-          ports:
-            - 5432:5432
-          env:
-            POSTGRES_DB: ${{ secrets.DB_NAME }}
-            POSTGRES_USER: ${{ secrets.DB_USER }}
-            POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          
-          options: 
-            --health-cmd "pg_isready -U $$POSTGRES_USER" 
-            --health-interval 10s 
-            --health-timeout 5s 
-            --health-retries 5
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        
+        options: 
+          --health-cmd "pg_isready -U $$POSTGRES_USER" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
     
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev
+
+    - name: Install remotes package
+      run: |
+        Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")'
+    
+    - name: Install R packages
+      run: |
+        Rscript -e 'install.packages(c("DBI", "RPostgres", "dplyr", "jsonlite"))'
+    
+    - name: Cache R packages
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.R_LIBS_USER }}
+        key: ${{ runner.os }}-R-${{ hashFiles('**/*.R') }}-${{ hashFiles('**/*.Rmd') }}
+        restore-keys: |
+          ${{ runner.os }}-R-${{ hashFiles('**/*.R') }}
+          ${{ runner.os }}-R-
+
+    - name: Install dependencies
+      run: |
+        Rscript -e 'remotes::install_deps(dependencies = TRUE)'
+
     - name: Run R script
-          env:
-            DB_HOST: localhost
-            DB_PORT: 5432
-            DB_USER: ${{ secrets.DB_USER }}
-            DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-            DB_NAME: ${{ secrets.DB_NAME }}
-          run: |
-            source("R/disneydata.R")
-        shell: Rscript {0}
+      env:
+        DB_HOST: localhost
+        DB_PORT: 5432
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+      run: |
+        source("R/disneydata.R")
+      shell: Rscript {0}

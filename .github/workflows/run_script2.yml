@@ -25,4 +25,6 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_NAME: ${{ secrets.DB_NAME }}
         run: |
-          Rscript "R/disneydata.R"
+          Rscript 
+          source("R/disneydata.R")
+        shell: Rscript {0}

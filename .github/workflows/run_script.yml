@@ -17,9 +17,17 @@ jobs:
 
     - name: Install system dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev
+        sudo apt-get update || sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev || sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev
 
+    - name: Cache system dependencies
+      uses: actions/cache@v2
+      with:
+        path: /usr/local/lib/R/site-library
+        key: ${{ runner.os }}-R-system-deps-${{ hashFiles('**/*.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-R-system-deps-
+      
     - name: Install remotes package
       run: |
         Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")'
@@ -43,7 +51,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:latest
+        image: postgres:13
         ports:
           - 5432:5432
         env:

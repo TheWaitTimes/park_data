@@ -37,9 +37,6 @@ jobs:
           ${{ runner.os }}-R-${{ hashFiles('**/*.R') }}
           ${{ runner.os }}-R-
 
-    - name: Install dependencies
-      run: |
-        Rscript -e 'remotes::install_deps(dependencies = TRUE)'
   
   run-r-script:
     runs-on: ubuntu-latest

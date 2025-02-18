@@ -49,6 +49,7 @@ dbSafeNames <- function(names) {
   names <- gsub('[^a-z0-9]+', '_', tolower(names))
   names <- make.names(names, unique=TRUE, allow_ = TRUE)
   names <- gsub('.', '_', names, fixed=TRUE)
+  names <- gsub('[^a-fA-F0-9]', '_', names)  # Ensure only valid hexadecimal characters
   names
 }
 

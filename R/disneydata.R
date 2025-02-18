@@ -29,7 +29,7 @@ mk_res <- "https://api.themeparks.wiki/v1/entity/75ea578a-adc8-4116-a54d-dccb607
 mk_df <- fromJSON(mk_res, flatten=TRUE)
 mk_data <- mk_df$liveData
 mk_data$time <- Sys.time()
-mk_data <- mk_data[c(2:3, 6, 8, 12:27)]
+mk_data <- mk_data[c(2:3, 6, 12:27)]
 
 # Hollywood Studios
 hs_res <- "https://api.themeparks.wiki/v1/entity/288747d1-8b4f-4a64-867e-ea7c9b27bad8/live"

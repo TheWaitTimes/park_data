@@ -43,10 +43,10 @@ jobs:
     - name: Install system dependencies
       run: |
         sudo apt-get update || sudo apt-get update
-        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev || sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev
+        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev || sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-d[...]
 
     - name: Cache system dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: /usr/local/lib/R/site-library
         key: ${{ runner.os }}-R-system-deps-${{ hashFiles('**/*.yml') }}
@@ -62,7 +62,7 @@ jobs:
         Rscript -e 'install.packages(c("DBI", "RPostgres", "dplyr", "jsonlite"))'
     
     - name: Cache R packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ env.R_LIBS_USER }}
         key: ${{ runner.os }}-R-${{ hashFiles('**/*.R') }}-${{ hashFiles('**/*.Rmd') }}

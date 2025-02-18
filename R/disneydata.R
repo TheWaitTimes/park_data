@@ -36,7 +36,7 @@ hs_res <- "https://api.themeparks.wiki/v1/entity/288747d1-8b4f-4a64-867e-ea7c9b2
 hs_df <- fromJSON(hs_res, flatten=TRUE)
 hs_data <- hs_df$liveData
 hs_data$time <- Sys.time()
-hs_data <- hs_data[c(2:3, 6, 8, 12:23)]
+hs_data <- hs_data[c(2:3, 6, 12:23)]
 
 # Animal Kingdom
 ak_res <- "https://api.themeparks.wiki/v1/entity/1c84a229-8862-4648-9c71-378ddd2c7693/live"

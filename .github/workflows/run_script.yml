@@ -5,10 +5,25 @@ on:
     - cron: '*/5 * * * *'
 
 jobs:
-  setup-r-environment:
-    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        
+        options: 
+          --health-cmd "pg_isready -U $$POSTGRES_USER" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+    setup-r-environment:
+        runs-on: ubuntu-latest
 
-    steps:
+        steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
@@ -53,22 +68,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-R-${{ hashFiles('**/*.R') }}
           ${{ runner.os }}-R-
-
-    services:
-      postgres:
-        image: postgres:13
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
-          POSTGRES_USER: ${{ secrets.DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        
-        options: 
-          --health-cmd "pg_isready -U $$POSTGRES_USER" 
-          --health-interval 10s 
-          --health-timeout 5s 
-          --health-retries 5
 
     - name: Run R script
       env:

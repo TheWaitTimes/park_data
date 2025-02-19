@@ -43,7 +43,7 @@ fetch_and_process_data <- function(url, cols) {
 # Data URLs and columns to keep
 urls <- list(
   epcot = list(url = "https://api.themeparks.wiki/v1/entity/47f90d2c-e191-4239-a466-5892ef59a88b/live", cols = c(2:3, 6:7, 12:28)),
-  magic_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/75ea578a-adc8-4116-a54d-dccb60765ef9/live", cols = c(2:3, 6, 12:27)),
+  magic_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/75ea578a-adc8-4116-a54d-dccb60765ef9/live", cols = c(2:3, 6, 12:26)),
   hollywood_studios = list(url = "https://api.themeparks.wiki/v1/entity/288747d1-8b4f-4a64-867e-ea7c9b27bad8/live", cols = c(2:3, 6, 12:23)),
   animal_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/1c84a229-8862-4648-9c71-378ddd2c7693/live", cols = c(2:3, 6, 7, 12:22))
 )

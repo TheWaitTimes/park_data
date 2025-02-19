@@ -27,39 +27,25 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install R
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y r-base
-
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
-
-    - name: Verify R installation
-      run: |
-        Rscript --version
+      with:
+        extra-packages: remotes
 
     - name: Install system dependencies
       run: |
-        sudo apt-get update || sudo apt-get update
-        sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev || sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev build-essential gcc g++ make libreadline-dev libzmq3-dev
+        sudo apt-get update
+        sudo apt-get install -y \
+          r-base \
+          libcurl4-openssl-dev \
+          libssl-dev \
+          libxml2-dev \
+          build-essential \
+          gcc g++ \
+          make \
+          libreadline-dev \
+          libzmq3-dev
 
-    - name: Cache system dependencies
-      uses: actions/cache@v3
-      with:
-        path: /usr/local/lib/R/site-library
-        key: ${{ runner.os }}-R-system-deps-${{ hashFiles('**/*.yml') }}
-        restore-keys: |
-          ${{ runner.os }}-R-system-deps-
-          
-    - name: Install remotes package
-      run: |
-        Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")'
-        
-    - name: Install R packages
-      run: |
-        Rscript -e 'install.packages(c("DBI", "RPostgres", "dplyr", "jsonlite"))'
-        
     - name: Cache R packages
       uses: actions/cache@v3
       with:
@@ -68,10 +54,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-R-${{ hashFiles('**/*.R') }}
           ${{ runner.os }}-R-
- 
-    - name: Check PostgreSQL service health
+
+    - name: Install R packages
       run: |
-        pg_isready -h localhost -p 5432 -U ${{ secrets.DB_USER }}
+        Rscript -e 'install.packages(c("DBI", "RPostgres", "dplyr", "jsonlite"))'
+
+    - name: Check PostgreSQL service health
+      run: pg_isready -h localhost -p 5432 -U ${{ secrets.DB_USER }}
 
     - name: Run R script
       env:
@@ -80,5 +69,4 @@ jobs:
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_NAME: ${{ secrets.DB_NAME }}
-      run: |
-        Rscript R/disneydata.R
+      run: Rscript R/disneydata.R

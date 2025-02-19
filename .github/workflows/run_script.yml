@@ -63,8 +63,5 @@ jobs:
     - name: Run R script
       env:
         DB_HOST: localhost
-        DB_PORT: 5432
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_NAME: ${{ secrets.DB_NAME }}
+        DB_PORT: ${{ job.services.postgres.ports[5432] }}
       run: Rscript R/disneydata.R

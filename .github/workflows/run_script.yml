@@ -64,7 +64,7 @@ jobs:
 
     - name: Run R script
       env:
-        DB_HOST: localhost
+        DB_HOST: postgres
         DB_PORT: ${{ job.services.postgres.ports[5432] }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}

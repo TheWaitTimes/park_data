@@ -8,21 +8,6 @@ jobs:
   setup-r-environment:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:13
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
-          POSTGRES_USER: ${{ secrets.DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        options: 
-          --health-cmd "pg_isready -U $$POSTGRES_USER" 
-          --health-interval 10s 
-          --health-timeout 5s 
-          --health-retries 5
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -44,8 +29,17 @@ jobs:
           gcc g++ \
           make \
           libreadline-dev \
-          libzmq3-dev
+          libzmq3-dev \
+          postgresql \
+          postgresql-contrib
 
+    - name: Start PostgreSQL service
+      run: |
+        sudo service postgresql start
+        sudo -u postgres psql -c "CREATE DATABASE ${{ secrets.DB_NAME }};"
+        sudo -u postgres psql -c "CREATE USER ${{ secrets.DB_USER }} WITH PASSWORD '${{ secrets.DB_PASSWORD }}';"
+        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_NAME }} TO ${{ secrets.DB_USER }};"
+    
     - name: Cache R packages
       uses: actions/cache@v3
       with:
@@ -65,7 +59,7 @@ jobs:
     - name: Run R script
       env:
         DB_HOST: localhost
-        DB_PORT: ${{ job.services.postgres.ports[5432] }}
+        DB_PORT: 5432
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         DB_NAME: ${{ secrets.DB_NAME }}

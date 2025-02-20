@@ -60,7 +60,7 @@ jobs:
         Rscript -e 'install.packages(c("DBI", "RPostgres", "dplyr", "jsonlite"))'
 
     - name: Check PostgreSQL service health
-      run: pg_isready -h localhost -p 5432 -U ${{ secrets.DB_USER }}
+      run: pg_isready -h localhost -p 5432 -U postgres
       continue-on-error: true
 
     - name: Run R script

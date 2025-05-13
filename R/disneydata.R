@@ -38,26 +38,12 @@ colnames(ep_data) <- dbSafeNames(colnames(ep_data))
 colnames(mk_data) <- dbSafeNames(colnames(mk_data))
 colnames(hs_data) <- dbSafeNames(colnames(hs_data))
 colnames(ak_data) <- dbSafeNames(colnames(ak_data))
-# Define the data folder path
-data_folder <- "TheWaitTimes/park_data/data"
 
-# Ensure the data folder exists
-if (!dir.exists(data_folder)) {
-  dir.create(data_folder, recursive = TRUE)
-}
-
-# Define a function to append data to CSV
-append_to_csv <- function(data, file_name) {
-  file_path <- file.path(data_folder, file_name)
-  if (!file.exists(file_path)) {
-    write_csv(data, file_path) # Create a new file if it doesn't exist
-  } else {
-    write_csv(data, file_path, append = TRUE) # Append to the existing file
-  }
-}
-
-# Save data to CSVs
-append_to_csv(ep_data, "ep_data.csv")
-append_to_csv(mk_data, "mk_data.csv")
-append_to_csv(hs_data, "hs_data.csv")
-append_to_csv(ak_data, "ak_data.csv")
+write.table(ep_data, "data/ep_data.csv", sep = ",", append = TRUE,
+            row.names=FALSE, col.names=FALSE)
+write.table(mk_data, "data/mk_data.csv", sep = ",", append = TRUE,
+            row.names=FALSE, col.names=FALSE)
+write.table(hs_data, "data/hs_data.csv", sep = ",", append = TRUE,
+            row.names=FALSE, col.names=FALSE)
+write.table(ak_data, "data/ak_data.csv", sep = ",", append = TRUE,
+            row.names=FALSE, col.names=FALSE)

@@ -39,11 +39,11 @@ colnames(mk_data) <- dbSafeNames(colnames(mk_data))
 colnames(hs_data) <- dbSafeNames(colnames(hs_data))
 colnames(ak_data) <- dbSafeNames(colnames(ak_data))
 # Define the data folder path
-data_folder <- "data"
+data_folder <- "TheWaitTimes/park_data/data"
 
 # Ensure the data folder exists
 if (!dir.exists(data_folder)) {
-  dir.create(data_folder)
+  dir.create(data_folder, recursive = TRUE)
 }
 
 # Define a function to append data to CSV

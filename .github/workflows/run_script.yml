@@ -2,7 +2,9 @@ name: Run R Script and Save to CSV
 
 on:
   schedule:
-    - cron: '*/10 * * * *' # Runs every 10 minutes
+    # Runs every 10 minutes from 1:00 PM to 4:00 AM UTC
+    - cron: '*/10 13-23 * * *' # From 1:00 PM to 11:00 PM UTC
+    - cron: '*/10 0-3 * * *'   # From midnight to 3:59 AM UTC (for the last hour of the 11 PM EST window)
 
 jobs:
   run-r-script:

@@ -11,6 +11,15 @@ dbSafeNames <- function(names) {
   names
 }
 
+# Data URLs and columns to keep
+urls <- list(
+  epcot = list(url = "https://api.themeparks.wiki/v1/entity/47f90d2c-e191-4239-a466-5892ef59a88b/live", cols = c(2:3, 6:7, 12:28)),
+  magic_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/75ea578a-adc8-4116-a54d-dccb60765ef9/live", cols = c(2:3, 6, 12:26)),
+  hollywood_studios = list(url = "https://api.themeparks.wiki/v1/entity/288747d1-8b4f-4a64-867e-ea7c9b27bad8/live", cols = c(2:3, 6, 12:23)),
+  animal_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/1c84a229-8862-4648-9c71-378ddd2c7693/live", cols = c(2:3, 6, 7, 12:22))
+)
+
+
 fetch_and_process_data <- function(url, cols) {
   df <- fromJSON(url, flatten=TRUE)$liveData
   df$time <- Sys.time()
@@ -20,23 +29,6 @@ fetch_and_process_data <- function(url, cols) {
   df <- df[, cols, drop = FALSE]
   
   df
-}
-missing_cols <- setdiff(cols, names(df))
-if (length(missing_cols) > 0) {
-  message("Missing columns: ", paste(missing_cols, collapse = ", "))
-}
-
-# Data URLs and columns to keep
-urls <- list(
-  epcot = list(url = "https://api.themeparks.wiki/v1/entity/47f90d2c-e191-4239-a466-5892ef59a88b/live", cols = c(2:3, 6:7, 12:28)),
-  magic_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/75ea578a-adc8-4116-a54d-dccb60765ef9/live", cols = c(2:3, 6, 12:26)),
-  hollywood_studios = list(url = "https://api.themeparks.wiki/v1/entity/288747d1-8b4f-4a64-867e-ea7c9b27bad8/live", cols = c(2:3, 6, 12:23)),
-  animal_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/1c84a229-8862-4648-9c71-378ddd2c7693/live", cols = c(2:3, 6, 7, 12:22))
-)
-
-# Ensure the 'data' directory exists
-if (!dir.exists("data")) {
-  dir.create("data")
 }
 
 # Process each park's data and write to CSV
@@ -59,3 +51,4 @@ for (park in names(urls)) {
     write_csv(data, file_path)
   }
 }
+

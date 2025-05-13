@@ -11,12 +11,19 @@ dbSafeNames <- function(names) {
   names
 }
 
-# Fetch and process data
 fetch_and_process_data <- function(url, cols) {
   df <- fromJSON(url, flatten=TRUE)$liveData
   df$time <- Sys.time()
-  df <- df[cols]
+  
+  # Ensure only existing columns are selected
+  cols <- intersect(cols, names(df))
+  df <- df[, cols, drop = FALSE]
+  
   df
+}
+missing_cols <- setdiff(cols, names(df))
+if (length(missing_cols) > 0) {
+  message("Missing columns: ", paste(missing_cols, collapse = ", "))
 }
 
 # Data URLs and columns to keep

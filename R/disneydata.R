@@ -1,5 +1,6 @@
 library(dplyr)
 library(jsonlite)
+library(readr)  # Added for better CSV handling
 
 # Safe column names function
 dbSafeNames <- function(names) {
@@ -26,6 +27,11 @@ urls <- list(
   animal_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/1c84a229-8862-4648-9c71-378ddd2c7693/live", cols = c(2:3, 6, 7, 12:22))
 )
 
+# Ensure the 'data' directory exists
+if (!dir.exists("data")) {
+  dir.create("data")
+}
+
 # Process each park's data and write to CSV
 for (park in names(urls)) {
   # Fetch and process data for the current park
@@ -34,15 +40,15 @@ for (park in names(urls)) {
   # Sanitize column names
   colnames(data) <- dbSafeNames(colnames(data))
   
-  # Define the file path for the CSV
-  file_path <- paste0(park, "_data.csv")
+  # Define the file path for the CSV inside the 'data' folder
+  file_path <- paste0("data/", park, "_data.csv")
   
   # Check if the file exists
   if (file.exists(file_path)) {
     # Append new data to the existing CSV
-    write.table(data, file = file_path, sep = ",", col.names = FALSE, row.names = FALSE, append = TRUE)
+    write_csv(data, file_path, append = TRUE)
   } else {
     # Write new data to a new CSV file (include column names)
-    write.table(data, file = file_path, sep = ",", col.names = TRUE, row.names = FALSE)
+    write_csv(data, file_path)
   }
 }

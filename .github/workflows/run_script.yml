@@ -48,5 +48,14 @@ jobs:
       run: |
         mkdir -p data
         Rscript R/disneydata.R
+
     - name: List directory contents
       run: ls -R
+
+    - name: Commit and Push Changes
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add data/*.csv
+        git commit -m "Update park data" || echo "No changes to commit"
+        git push

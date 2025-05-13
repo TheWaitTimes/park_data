@@ -1,36 +1,14 @@
-library(DBI)
-library(RPostgres)
 library(dplyr)
 library(jsonlite)
 
-db_host <- Sys.getenv("DB_HOST")
-db_port <- Sys.getenv("DB_PORT")
-db_user <- Sys.getenv("DB_USER")
-db_password <- Sys.getenv("DB_PASSWORD")
-db_name <- Sys.getenv("DB_NAME")
-
-# Function to connect to the database with retry logic
-connect_db <- function(retries = 5) {
-  for (i in 1:retries) {
-    con <- tryCatch({
-      dbConnect(RPostgres::Postgres(),
-                host = db_host,
-                port = db_port,
-                user = db_user,
-                password = db_password,
-                dbname = db_name)
-    }, error = function(e) {
-      message(paste("Connection attempt", i, "failed:", e$message))
-      Sys.sleep(5) # Wait 5 seconds before retrying
-      NULL
-    })
-    if (!is.null(con)) return(con)
-  }
-  stop("Failed to connect to the database after", retries, "attempts")
+# Safe column names function
+dbSafeNames <- function(names) {
+  names <- gsub('[^a-z0-9]+', '_', tolower(names))
+  names <- make.names(names, unique=TRUE, allow_=TRUE)
+  names <- gsub('.', '_', names, fixed=TRUE)
+  names <- gsub('[^a-fA-F0-9]', '_', names)  # Ensure only valid hexadecimal characters
+  names
 }
-
-# Connect to the PostgreSQL database
-con <- connect_db()
 
 # Fetch and process data
 fetch_and_process_data <- function(url, cols) {
@@ -48,20 +26,23 @@ urls <- list(
   animal_kingdom = list(url = "https://api.themeparks.wiki/v1/entity/1c84a229-8862-4648-9c71-378ddd2c7693/live", cols = c(2:3, 6, 7, 12:22))
 )
 
-# Safe column names function
-dbSafeNames <- function(names) {
-  names <- gsub('[^a-z0-9]+', '_', tolower(names))
-  names <- make.names(names, unique=TRUE, allow_=TRUE)
-  names <- gsub('.', '_', names, fixed=TRUE)
-  names <- gsub('[^a-fA-F0-9]', '_', names)  # Ensure only valid hexadecimal characters
-  names
-}
-
-# Process each park's data and write to the database
+# Process each park's data and write to CSV
 for (park in names(urls)) {
+  # Fetch and process data for the current park
   data <- fetch_and_process_data(urls[[park]]$url, urls[[park]]$cols)
+  
+  # Sanitize column names
   colnames(data) <- dbSafeNames(colnames(data))
-  dbWriteTable(con, park, data, append = TRUE, row.names = FALSE)
+  
+  # Define the file path for the CSV
+  file_path <- paste0(park, "_data.csv")
+  
+  # Check if the file exists
+  if (file.exists(file_path)) {
+    # Append new data to the existing CSV
+    write.table(data, file = file_path, sep = ",", col.names = FALSE, row.names = FALSE, append = TRUE)
+  } else {
+    # Write new data to a new CSV file (include column names)
+    write.table(data, file = file_path, sep = ",", col.names = TRUE, row.names = FALSE)
+  }
 }
-
-dbDisconnect(con)

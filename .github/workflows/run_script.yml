@@ -46,5 +46,5 @@ jobs:
 
     - name: Run R script and save to data folder
       run: |
-        mkdir -p TheWaitTimes/park_data/data
+        mkdir -p data
         Rscript R/disneydata.R

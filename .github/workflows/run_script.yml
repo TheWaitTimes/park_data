@@ -48,3 +48,5 @@ jobs:
       run: |
         mkdir -p data
         Rscript R/disneydata.R
+    - name: List directory contents
+      run: ls -R

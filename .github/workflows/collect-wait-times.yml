@@ -1,0 +1,49 @@
+name: Collect WDW Wait Times
+
+on:
+  schedule:
+    # Every 30 minutes, every day, all day (UTC). The script checks each
+    # park's actual operating hours and skips parks that are closed, so
+    # this doesn't need manual trimming for seasonal hours, DST, etc.
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}   # lets you trigger a manual test run from the Actions tab
+
+# Needed so the built-in GITHUB_TOKEN can push commits back to this repo.
+permissions:
+  contents: write
+
+# Prevents two runs from overlapping and racing to push at the same time.
+concurrency:
+  group: wait-times-collector
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Collect wait times
+        run: python scripts/collect_wait_times.py
+
+      - name: Commit and push data
+        run: |
+          git config user.name "wait-times-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No new data this run."
+          else
+            git commit -m "Wait times $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push
+          fi

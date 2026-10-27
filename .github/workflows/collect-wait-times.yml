@@ -2,17 +2,16 @@ name: Collect WDW Wait Times
 
 on:
   schedule:
-    # Every 30 minutes, every day, all day (UTC). The script checks each
-    # park's actual operating hours and skips parks that are closed, so
-    # this doesn't need manual trimming for seasonal hours, DST, etc.
-    - cron: '*/30 * * * *'
-  workflow_dispatch: {}   # lets you trigger a manual test run from the Actions tab
+    # Run every 30 minutes during the typical WDW park operating window.
+    # GitHub cron is UTC, so this matches the daytime/evening park hours
+    # while still letting the script skip parks that are closed.
+    - cron: '0,30 13-23 * * *'
+    - cron: '0,30 0-4 * * *'
+  workflow_dispatch: {}
 
-# Needed so the built-in GITHUB_TOKEN can push commits back to this repo.
 permissions:
   contents: write
 
-# Prevents two runs from overlapping and racing to push at the same time.
 concurrency:
   group: wait-times-collector
   cancel-in-progress: false

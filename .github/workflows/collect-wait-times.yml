@@ -2,11 +2,8 @@ name: Collect WDW Wait Times
 
 on:
   schedule:
-    # Run every 30 minutes during the typical WDW park operating window.
-    # GitHub cron is UTC, so this matches the daytime/evening park hours
-    # while still letting the script skip parks that are closed.
-    - cron: '0,30 13-23 * * *'
-    - cron: '0,30 0-4 * * *'
+    - cron: '7,37 13-23 * * *'
+    - cron: '7,37 0-4 * * *'
   workflow_dispatch: {}
 
 permissions:
@@ -19,9 +16,18 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Log collection start
+        run: |
+          echo "Collection started"
+          echo "UTC time: $(date -u)"
+          echo "Event: ${{ github.event_name }}"
+          echo "Run ID: ${{ github.run_id }}"
+
+      - name: Check out repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -38,11 +44,20 @@ jobs:
         run: |
           git config user.name "wait-times-bot"
           git config user.email "actions@users.noreply.github.com"
+
           git add data/
+
           if git diff --cached --quiet; then
-            echo "No new data this run."
+            echo "No new data to commit."
           else
             git commit -m "Wait times $(date -u +'%Y-%m-%d %H:%M UTC')"
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push
           fi
+
+      - name: Log collection completion
+        if: always()
+        run: |
+          echo "Collection job finished"
+          echo "UTC time: $(date -u)"
+          echo "Job status: ${{ job.status }}"
